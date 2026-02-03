@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apprends tes Tables !</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Tahoma, Verdana, sans-serif;
+            background: linear-gradient(135deg, #00FFFF 0%, #7fffd4 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            border-radius: 30px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #DC143C;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        .table-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .table-btn {
+            background: linear-gradient(135deg, #DC143C 0%, #8B0000 100%);
+            border: none;
+            border-radius: 20px;
+            padding: 30px;
+            font-size: 2em;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .table-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .table-btn:active {
+            transform: translateY(0);
+        }
+
+        .question {
+            text-align: center;
+            font-size: 3em;
+            color: #333;
+            margin: 40px 0;
+            font-weight: bold;
+        }
+
+        .answers-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .answer-btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border: none;
+            border-radius: 20px;
+            padding: 40px;
+            font-size: 2em;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .sound {
+            margin: 0px 0px 5px;
+            text-align: right;
+        }
+
+        .sound-btn {
+            text-align: center;
+            border: none;
+            background: white;
+            font-size: 1.5em;
+            font-weight: bold;
+            cursor:pointer;
+        }
+
+        .answer-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .answer-btn:active {
+            transform: scale(0.95);
+        }
+
+        .answer-btn.correct {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            animation: correctAnim 0.5s;
+        }
+
+        .answer-btn.wrong {
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+            animation: wrongAnim 0.5s;
+        }
+
+        @keyframes correctAnim {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes wrongAnim {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .score-display {
+            text-align: center;
+            margin: 40px 0;
+        }
+
+        .score-number {
+            font-size: 5em;
+            color: #DC143C;
+            font-weight: bold;
+        }
+
+        .score-text {
+            font-size: 1.5em;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            border: none;
+            border-radius: 20px;
+            padding: 25px;
+            font-size: 1.5em;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+        }
+
+        .progress {
+            text-align: center;
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .emoji {
+            font-size: 3em;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .comment {
+            font-size: 3em;
+            color: #666;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Écran de sélection -->
+        <div id="selectScreen" class="screen active">
+            <h1>🎯 Choisis ta table !</h1>
+            <div class="table-grid" id="tableGrid"></div>
+        </div>
+
+        <!-- Écran de jeu -->
+        <div id="gameScreen" class="screen">
+            <div class="sound" id="sound">
+                <button class="sound-btn" onclick="toggleMute()"><span id="mute"></span></button>
+            </div>
+            <div class="progress" id="progress"></div>
+            <div class="question" id="question"></div>
+            <div class="answers-grid" id="answersGrid"></div>
+            <div class="action-buttons">
+                <button class="action-btn" onclick="restart()">🔄 Refaire cette table</button>
+                <button class="action-btn" onclick="goHome()">🏠 Choisir une autre table</button>
+            </div>
+        </div>
+
+        <!-- Écran de résultat -->
+        <div id="resultScreen" class="screen">
+            <h1>🎉 Terminé !</h1>
+            <div class="emoji" id="resultEmoji"></div>
+            <div class="comment" id="comment"></div>
+            <div class="score-display">
+                <div class="score-number" id="finalScore"></div>
+                <div class="score-text">sur 10</div>
+            </div>
+            <div class="action-buttons">
+                <button class="action-btn" onclick="restart()">🔄 Refaire cette table</button>
+                <button class="action-btn" onclick="goHome()">🏠 Choisir une autre table</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedTable = 0;
+        let currentQuestion = 0;
+        let score = 0;
+        let questions = [];
+
+        let isMute = false;
+
+        // Initialisation
+        function init() {
+            const tableGrid = document.getElementById('tableGrid');
+            for (let i = 2; i <= 10; i++) {
+                const btn = document.createElement('button');
+                btn.className = 'table-btn';
+                btn.textContent = `${i}`;
+                btn.onclick = () => startGame(i);
+                tableGrid.appendChild(btn);
+            }
+        }
+
+        //désactiver l'audio
+        function toggleMute() {
+            isMute = !isMute;
+            console.log('isMute : ', isMute);
+            if(isMute) {
+                document.getElementById('mute').textContent = '🔇';
+                } else document.getElementById('mute').textContent = '🔈';
+        }
+
+        // Démarrer le jeu
+        function startGame(table) {
+            selectedTable = table;
+            currentQuestion = 0;
+            score = 0;
+            questions = generateQuestions(table);
+            showScreen('gameScreen');
+            showQuestion();
+        }
+
+        // Générer 10 questions aléatoires
+        function generateQuestions(table) {
+            const qs = [];
+            const used = new Set();
+            
+            while (qs.length < 10) {
+                const multiplier = Math.floor(Math.random() * 10) + 1;
+                if (!used.has(multiplier)) {
+                    used.add(multiplier);
+                    qs.push({
+                        a: table,
+                        b: multiplier,
+                        correct: table * multiplier
+                    });
+                }
+            }
+            return qs;
+        }
+
+        // Afficher une question
+        function showQuestion() {
+            if (currentQuestion >= questions.length) {
+                showResults();
+                return;
+            }
+
+            const q = questions[currentQuestion];
+            document.getElementById('progress').textContent = `Question ${currentQuestion + 1}/10`;
+            if(isMute) {
+            document.getElementById('mute').textContent = '🔇';
+            } else document.getElementById('mute').textContent = '🔈';
+            document.getElementById('question').textContent = `${q.a} × ${q.b} = ?`;
+
+            const answersGrid = document.getElementById('answersGrid');
+            answersGrid.innerHTML = '';
+
+            const answers = generateAnswers(q.correct);
+            answers.forEach(answer => {
+                const btn = document.createElement('button');
+                btn.className = 'answer-btn';
+                btn.textContent = answer;
+                btn.onclick = () => checkAnswer(answer, q.correct, btn);
+                answersGrid.appendChild(btn);
+            });
+        }
+
+        // Générer 4 réponses (1 correcte + 3 fausses)
+        function generateAnswers(correct) {
+            const answers = [correct];
+            const used = new Set([correct]);
+
+            while (answers.length < 4) {
+                const offset = Math.floor(Math.random() * 20) - 10;
+                let wrong = correct + offset;
+                if (wrong > 0 && !used.has(wrong)) {
+                    used.add(wrong);
+                    answers.push(wrong);
+                }
+            }
+
+            return answers.sort(() => Math.random() - 0.5);
+        }
+
+        // Vérifier la réponse
+        function checkAnswer(selected, correct, btn) {
+            const allBtns = document.querySelectorAll('.answer-btn');
+            allBtns.forEach(b => b.disabled = true);
+
+            if (selected === correct) {
+                btn.classList.add('correct');
+                if(!isMute) {
+                    playSound(true);
+                }
+                score++;
+            } else {
+                btn.classList.add('wrong');
+                if(!isMute) {
+                    playSound(false);
+                }
+                // Montrer la bonne réponse
+                allBtns.forEach(b => {
+                    if (parseInt(b.textContent) === correct) {
+                        b.classList.add('correct');
+                    }
+                });
+            }
+
+            setTimeout(() => {
+                currentQuestion++;
+                showQuestion();
+            }, 1500);
+        }
+
+        // Jouer un son
+        function playSound(isCorrect) {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            if (isCorrect) {
+                oscillator.frequency.value = 523.25; // Do
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                oscillator.start();
+                oscillator.stop(audioContext.currentTime + 0.2);
+                
+                setTimeout(() => {
+                    const osc2 = audioContext.createOscillator();
+                    const gain2 = audioContext.createGain();
+                    osc2.connect(gain2);
+                    gain2.connect(audioContext.destination);
+                    osc2.frequency.value = 659.25; // Mi
+                    gain2.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    osc2.start();
+                    osc2.stop(audioContext.currentTime + 0.2);
+                }, 100);
+            } else {
+                oscillator.frequency.value = 200;
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                oscillator.start();
+                oscillator.stop(audioContext.currentTime + 0.3);
+            }
+        }
+
+        // Afficher les résultats
+        function showResults() {
+            document.getElementById('finalScore').textContent = score;
+            
+            let emoji = '🎉';
+            if (score === 10) emoji = '🏆';
+            else if (score >= 8) emoji = '😊';
+            else if (score > 5) emoji = '👍';
+            else emoji = '💪';
+            
+            document.getElementById('resultEmoji').textContent = emoji;
+
+            let comment = '';
+            if (score === 10) comment = 'Félicitations';
+            else if (score >= 8) comment = 'Bravo';
+            else if (score > 5) comment = 'Pas mal';
+            else comment = 'Encore un effort';
+
+            document.getElementById('comment').textContent = comment;
+
+            showScreen('resultScreen');
+        }
+
+        // Recommencer avec la même table
+        function restart() {
+            startGame(selectedTable);
+        }
+
+        // Retour à l'accueil
+        function goHome() {
+            showScreen('selectScreen');
+        }
+
+        // Changer d'écran
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        // Lancer l'app
+        init();
+    </script>
+</body>
+</html>
