@@ -208,18 +208,207 @@
             margin: 20px 0;
         }
 
+/* TIMER STYLE */
+
+        .timer-display {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 4px;
+        }
+
+        .timer-circle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+        }
+
+        .circle-bg {
+            fill: none;
+            stroke: #fa709a;
+            stroke-width: 2px;
+        }
+
+        .circle-progress {
+            fill: none;
+            stroke: #4facfe;
+            stroke-width: 2;
+            stroke-linecap: round;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+            transition: stroke-dashoffset .5s linear;
+        }
+
+        .time-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 15px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .pulse {
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.05);
+            }
+        }
+
+        .finished {
+            color: #f5576c !important;
+            animation: flash 0.5s ease-in-out infinite;
+        }
+
+        @keyframes flash {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+
+        /* LEVEL STYLE */
+
+        .title {
+            color: #dc143c;
+            font-size: 32px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .target-icon {
+            font-size: 36px;
+        }
+
+        .levels-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .level-button {
+            background: #dc143c;
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 24px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(220, 20, 60, 0.3);
+        }
+
+        .level-button:hover {
+            background: #b8112f;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(220, 20, 60, 0.4);
+        }
+
+        .level-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(220, 20, 60, 0.3);
+        }
+
+        .level-button.selected {
+            background: #4facfe;
+            box-shadow: 0 4px 12px rgba(0, 150, 136, 0.4);
+        }
+
+        .level-button.selected:hover {
+            background: #4facfe;
+        }
+
+        .level-description {
+            font-size: 16px;
+            font-weight: normal;
+            opacity: 0.9;
+            margin-top: 8px;
+        }
+
+        .selected-level-display {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .level-value {
+            font-weight: bold;
+            color: white;
+            font-size: 24px;
+        }
+
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Écran de sélection -->
-        <div id="selectScreen" class="screen active">
+
+        <!-- Écran de sélection du niveau -->
+        <div id="levelScreen" class="screen">
+            <h1 class="title">
+                <span class="target-icon">🎯</span>
+                Choisis un niveau
+            </h1>
+            <div class="levels-grid">
+                <button class="level-button selected" data-level="0">
+                    Facile
+                    <div class="level-description">Sans minuteur</div>
+                </button>
+                <button class="level-button" data-level="1">
+                    Moyen
+                    <div class="level-description">Minuteur de 30s</div>
+                </button>
+                <button class="level-button" data-level="2">
+                    Expert
+                    <div class="level-description">Minuteur de 15s</div>
+                </button>
+            </div>
+            <div class="action-buttons">
+                <button class="action-btn" onclick="init_game()">
+                    🚀 Jouer en : <span class="level-value" id="levelDisplay">Facile</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Écran de sélection de la table -->
+        <div id="selectScreen" class="screen">
             <h1>🎯 Choisis ta table !</h1>
             <div class="table-grid" id="tableGrid"></div>
         </div>
 
         <!-- Écran de jeu -->
         <div id="gameScreen" class="screen">
+            <div class="timer" id="timer">
+                <div class="timer-display">
+                    <svg class="timer-circle">
+                        <circle class="circle-bg" cx="30" cy="30" r="29"></circle>
+                        <circle class="circle-progress" cx="30" cy="30" r="29"></circle>
+                    </svg>
+                    <div class="time-text" id="timeDisplay">30</div>
+                </div>
+            </div>
             <div class="sound" id="sound">
                 <button class="sound-btn" onclick="toggleMute()"><span id="mute"></span></button>
             </div>
@@ -228,7 +417,8 @@
             <div class="answers-grid" id="answersGrid"></div>
             <div class="action-buttons">
                 <button class="action-btn" onclick="restart()">🔄 Refaire cette table</button>
-                <button class="action-btn" onclick="goHome()">🏠 Choisir une autre table</button>
+                <button class="action-btn" onclick="chooseTable()">🔢 Choisir une autre table</button>
+                <button class="action-btn" onclick="goHome()">🏠 Choisir un autre niveau</button>
             </div>
         </div>
 
@@ -243,7 +433,8 @@
             </div>
             <div class="action-buttons">
                 <button class="action-btn" onclick="restart()">🔄 Refaire cette table</button>
-                <button class="action-btn" onclick="goHome()">🏠 Choisir une autre table</button>
+                <button class="action-btn" onclick="chooseTable()">🔢 Choisir une autre table</button>
+                <button class="action-btn" onclick="goHome()">🏠 Choisir un autre niveau</button>
             </div>
         </div>
     </div>
@@ -255,10 +446,42 @@
         let questions = [];
 
         let isMute = false;
+        let level = 0;
+
+        //level logic
+
+                // Récupération de tous les boutons
+        const levelButtons = document.querySelectorAll('.level-button');
+        const levelDisplay = document.getElementById('levelDisplay');
+
+        // Ajout de l'événement click sur chaque bouton
+        levelButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Retirer la classe 'selected' de tous les boutons
+                levelButtons.forEach(btn => btn.classList.remove('selected'));
+                
+                // Ajouter la classe 'selected' au bouton cliqué
+                this.classList.add('selected');
+                
+                // Mettre à jour la variable level
+                level = parseInt(this.getAttribute('data-level'));
+                
+                // Afficher le niveau sélectionné
+                const levelNames = ['Facile', 'Moyen', 'Expert'];
+                levelDisplay.textContent = levelNames[level];
+            });
+        });
+
+
+        function init() {
+            showScreen('levelScreen');
+        }
 
         // Initialisation
-        function init() {
+        function init_game() {
+            showScreen("selectScreen");
             const tableGrid = document.getElementById('tableGrid');
+            if(tableGrid.childElementCount == 0) {
             for (let i = 2; i <= 10; i++) {
                 const btn = document.createElement('button');
                 btn.className = 'table-btn';
@@ -267,18 +490,19 @@
                 tableGrid.appendChild(btn);
             }
         }
+        }
 
         //désactiver l'audio
         function toggleMute() {
             isMute = !isMute;
-            console.log('isMute : ', isMute);
             if(isMute) {
                 document.getElementById('mute').textContent = '🔇';
                 } else document.getElementById('mute').textContent = '🔈';
         }
 
-        // Démarrer le jeu
+        // Démarrer le jeu 
         function startGame(table) {
+            resetTimer();
             selectedTable = table;
             currentQuestion = 0;
             score = 0;
@@ -311,6 +535,11 @@
             if (currentQuestion >= questions.length) {
                 showResults();
                 return;
+            }
+
+            if(level >0 ) {
+            // start timer
+            startTimer();
             }
 
             const q = questions[currentQuestion];
@@ -375,10 +604,34 @@
             }
 
             setTimeout(() => {
+                resetTimer();
                 currentQuestion++;
                 showQuestion();
             }, 1500);
         }
+
+        function checkAnswerTooLate(correct) {
+            console.log('too late');
+            const allBtns = document.querySelectorAll('.answer-btn');
+            allBtns.forEach(b => b.disabled = true);
+
+            if(!isMute) {
+                playSound(false);
+            }
+            // Montrer la bonne réponse
+            allBtns.forEach(b => {
+                if (parseInt(b.textContent) === correct) {
+                    b.classList.add('correct');
+                }
+            });
+            setTimeout(() => {
+                console.log('resetting timer after too late');
+                console.log('current question :', currentQuestion);
+                resetTimer();
+                currentQuestion++;
+                showQuestion();
+            }, 1500);
+    }
 
         // Jouer un son
         function playSound(isCorrect) {
@@ -415,6 +668,7 @@
 
         // Afficher les résultats
         function showResults() {
+            pauseTimer();
             document.getElementById('finalScore').textContent = score;
             
             let emoji = '🎉';
@@ -443,6 +697,12 @@
 
         // Retour à l'accueil
         function goHome() {
+            resetTimer();
+            showScreen('levelScreen');
+        }
+
+        function chooseTable() {
+            resetTimer();
             showScreen('selectScreen');
         }
 
@@ -454,6 +714,101 @@
 
         // Lancer l'app
         init();
+
+        // timer functions
+        const timeDisplay = document.getElementById('timeDisplay');
+        const circleProgress = document.querySelector('.circle-progress');
+
+        let totalSeconds = 0;
+        let remainingSeconds = 0;
+        let timerInterval = null;
+        let isRunning = false;
+
+        const circumference = 2 * Math.PI * 29;
+        circleProgress.style.strokeDasharray = circumference;
+        circleProgress.style.strokeDashoffset = 0;
+
+        function updateDisplay() {
+            const minutes = Math.floor(remainingSeconds / 60);
+            const seconds = remainingSeconds % 60;
+            timeDisplay.textContent = `${String(seconds).padStart(2, '0')}`;
+            
+            const progress = remainingSeconds / totalSeconds;
+            const offset = circumference * (1 - progress);
+            circleProgress.style.strokeDashoffset = offset;
+        }
+
+        function startTimer() {
+            if (!isRunning) {
+                if (remainingSeconds === 0) {
+                    const mins = 0;
+                    const secs = 30 / level;
+                    totalSeconds = mins * 60 + secs;
+                    remainingSeconds = totalSeconds;
+                }
+                
+                isRunning = true;
+                
+                timeDisplay.classList.remove('finished');
+                
+                timerInterval = setInterval(() => {
+                    remainingSeconds--;
+                    updateDisplay();
+                    
+                    if (remainingSeconds <= 0) {
+                        clearInterval(timerInterval);
+                        isRunning = false;
+                        timeDisplay.classList.add('finished');
+                        if(!isMute) {
+                            playSound_timer();
+                        }
+                                   if (currentQuestion >= questions.length) {
+                                    showResults();
+                                    return;
+                                } else {
+                                    checkAnswerTooLate(questions[currentQuestion].correct);
+                                }
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            isRunning = false;
+            remainingSeconds = 0;
+            totalSeconds = 0;
+            timeDisplay.classList.remove('finished');
+            if(level == 0) {timeDisplay.textContent = '♾️';}
+            else {timeDisplay.textContent = String(30/level);}
+            circleProgress.style.strokeDashoffset = 0;
+        }
+
+        function playSound_timer() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+        }
+
+        function pauseTimer() {
+            if (isRunning) {
+                clearInterval(timerInterval);
+                isRunning = false;
+            }
+        }
+
     </script>
 </body>
 </html>
