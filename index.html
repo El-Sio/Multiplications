@@ -213,6 +213,11 @@
             transform: translateY(-3px);
         }
 
+        .action-btn:disabled {
+            background: linear-gradient(135deg, #666 0%, #333 100%);
+            cursor: not-allowed;
+        }
+
         .progress {
             text-align: center;
             font-size: 1.2em;
@@ -408,7 +413,7 @@
             </div>
             <div class="action-buttons">
                 <button class="action-btn" id="startButton"" onclick="init_game()">
-                    🚀 Jouer en : <span class="level-value" id="levelDisplay">Facile</span>
+                    <span class="level-value" id="levelDisplay">choisis un niveau</span>
                 </button>
             </div>
         </div>
@@ -481,6 +486,7 @@
         // desactiver le bouton de jeu si aucun niveau sélectionné.
         const startButton = document.getElementById('startButton')
         if(!level) {startButton.disabled = true;}
+        levelButtons.forEach(btn => btn.classList.remove('selected'));
 
         // Ajout de l'événement click sur chaque bouton
         levelButtons.forEach(button => {
@@ -496,7 +502,8 @@
                 
                 // Afficher le niveau sélectionné
                 const levelNames = ['Facile', 'Moyen', 'Expert'];
-                levelDisplay.textContent = levelNames[level];
+                levelDisplay.textContent = '🚀 Jouer en : ' + levelNames[level];
+                startButton.disabled = false;
             });
         });
 
