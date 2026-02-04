@@ -16,9 +16,25 @@
             background: linear-gradient(135deg, #00FFFF 0%, #7fffd4 100%);
             min-height: 100vh;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             padding: 10px;
+        }
+
+        .title {
+            margin-bottom: 0px;
+        }
+
+        .titlecontainer {
+            
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            border-radius: 30px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
         }
 
         .container {
@@ -34,6 +50,14 @@
             text-align: center;
             color: #DC143C;
             font-size: 2.5em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: black;
+            font-size: 1.8em;
             margin-bottom: 30px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
         }
@@ -282,17 +306,6 @@
 
         /* LEVEL STYLE */
 
-        .title {
-            color: #dc143c;
-            font-size: 32px;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
 
         .target-icon {
             font-size: 36px;
@@ -305,36 +318,43 @@
         }
 
         .level-button {
-            background: #dc143c;
-            color: white;
+            background: linear-gradient(135deg, #DC143C 0%, #8B0000 100%);
             border: none;
-            border-radius: 16px;
-            padding: 24px;
-            font-size: 24px;
+            border-radius: 20px;
+            padding: 30px;
+            font-size: 2em;
             font-weight: bold;
+            color: white;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(220, 20, 60, 0.3);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
         .level-button:hover {
-            background: #b8112f;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(220, 20, 60, 0.4);
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
         }
 
         .level-button:active {
-            transform: translateY(0);
             box-shadow: 0 2px 8px rgba(220, 20, 60, 0.3);
         }
 
         .level-button.selected {
-            background: #4facfe;
-            box-shadow: 0 4px 12px rgba(0, 150, 136, 0.4);
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border: none;
+            border-radius: 20px;
+            padding: 30px;
+            font-size: 2em;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
         .level-button.selected:hover {
-            background: #4facfe;
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
         }
 
         .level-description {
@@ -363,14 +383,14 @@
     </style>
 </head>
 <body>
+    <div class="titlecontainer">
+        <h1 class="title">Apprends tes tables !</h1>
+    </div>
     <div class="container">
 
         <!-- Écran de sélection du niveau -->
         <div id="levelScreen" class="screen">
-            <h1 class="title">
-                <span class="target-icon">🎯</span>
-                Choisis un niveau
-            </h1>
+            <h1>🎯 Choisis un niveau</h1>
             <div class="levels-grid">
                 <button class="level-button selected" data-level="0">
                     Facile
@@ -378,15 +398,15 @@
                 </button>
                 <button class="level-button" data-level="1">
                     Moyen
-                    <div class="level-description">Minuteur de 30s</div>
+                    <div class="level-description">Minuteur de 20s</div>
                 </button>
                 <button class="level-button" data-level="2">
                     Expert
-                    <div class="level-description">Minuteur de 15s</div>
+                    <div class="level-description">Minuteur de 10s</div>
                 </button>
             </div>
             <div class="action-buttons">
-                <button class="action-btn" onclick="init_game()">
+                <button class="action-btn" id="startButton"" onclick="init_game()">
                     🚀 Jouer en : <span class="level-value" id="levelDisplay">Facile</span>
                 </button>
             </div>
@@ -396,6 +416,9 @@
         <div id="selectScreen" class="screen">
             <h1>🎯 Choisis ta table !</h1>
             <div class="table-grid" id="tableGrid"></div>
+            <div class="action-buttons">
+                <button class="action-btn" onclick="goHome()">🏠 Choisir un autre niveau</button>
+            </div>
         </div>
 
         <!-- Écran de jeu -->
@@ -446,13 +469,17 @@
         let questions = [];
 
         let isMute = false;
-        let level = 0;
+        let level = null;
 
         //level logic
 
                 // Récupération de tous les boutons
         const levelButtons = document.querySelectorAll('.level-button');
         const levelDisplay = document.getElementById('levelDisplay');
+
+        // desactiver le bouton de jeu si aucun niveau sélectionné.
+        const startButton = document.getElementById('startButton')
+        if(!level) {startButton.disabled = true;}
 
         // Ajout de l'événement click sur chaque bouton
         levelButtons.forEach(button => {
@@ -742,7 +769,7 @@
             if (!isRunning) {
                 if (remainingSeconds === 0) {
                     const mins = 0;
-                    const secs = 30 / level;
+                    const secs = 20 / level;
                     totalSeconds = mins * 60 + secs;
                     remainingSeconds = totalSeconds;
                 }
@@ -780,7 +807,7 @@
             totalSeconds = 0;
             timeDisplay.classList.remove('finished');
             if(level == 0) {timeDisplay.textContent = '♾️';}
-            else {timeDisplay.textContent = String(30/level);}
+            else {timeDisplay.textContent = String(20/level);}
             circleProgress.style.strokeDashoffset = 0;
         }
 
