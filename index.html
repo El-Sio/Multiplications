@@ -5,7 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Apprends tes Tables !</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+    <!-- CSS sheet -->
     <style>
+
+        /* Main app Styles */
         * {
             margin: 0;
             padding: 0;
@@ -238,7 +242,7 @@
             margin: 20px 0;
         }
 
-/* TIMER STYLE */
+        /* Timer Styles */
 
         .timer-display {
             position: absolute;
@@ -310,7 +314,7 @@
         }
 
 
-        /* LEVEL STYLE */
+        /* Level select */
 
 
         .target-icon {
@@ -415,7 +419,11 @@
 
     </style>
 </head>
+
+<!-- Html components section -->
+
 <body>
+    
     <!-- Bloc titre permanent -->
     <div class="titlecontainer">
         <h1 class="title">Apprends tes tables !</h1>
@@ -432,11 +440,11 @@
                 </button>
                 <button class="level-button" data-level="1">
                     Moyen
-                    <div class="level-description">Minuteur de 20s</div>
+                    <div class="level-description"></div>
                 </button>
                 <button class="level-button" data-level="2">
                     Expert
-                    <div class="level-description">Minuteur de 10s</div>
+                    <div class="level-description"></div>
                 </button>
             </div>
             <div class="action-buttons">
@@ -497,20 +505,27 @@
     </div>
 
     <!-- Pied de page permanent -->
-     <div class="footer"><a href="https://github.com/El-Sio/Multiplications">By El-Sio</a></div>
+     <div class="footer"><a target=_blank href="https://github.com/El-Sio/Multiplications">By El-Sio</a></div>
 
+
+    <!-- Game Logic --> 
     <script>
+
+        //initialization
+
         let selectedTable = 0;
         let currentQuestion = 0;
         let score = 0;
         let questions = [];
-
         let isMute = false;
         let level = null;
 
+        //Limite de temps
+        let TIME_LIMIT = 20;
+
         //level logic
 
-                // Récupération de tous les boutons
+        // Récupération de tous les boutons
         const levelButtons = document.querySelectorAll('.level-button');
         const levelDisplay = document.getElementById('levelDisplay');
 
@@ -536,6 +551,13 @@
                 levelDisplay.textContent = '🚀 Jouer en : ' + levelNames[level];
                 startButton.disabled = false;
             });
+        // add descriptor depending on the Time Limit Constant
+        levelButtons.forEach(b => {
+                if(b.getAttribute('data-level') != "0") {
+                    b.children[0].textContent = `Minuteur de ${TIME_LIMIT/Number(b.getAttribute('data-level'))}s`;
+                }
+            });
+        
         });
 
 
@@ -808,7 +830,7 @@
             if (!isRunning) {
                 if (remainingSeconds === 0) {
                     const mins = 0;
-                    const secs = 20 / level;
+                    const secs = TIME_LIMIT / level;
                     totalSeconds = mins * 60 + secs;
                     remainingSeconds = totalSeconds;
                 }
@@ -846,7 +868,7 @@
             totalSeconds = 0;
             timeDisplay.classList.remove('finished');
             if(level == 0) {timeDisplay.textContent = '♾️';}
-            else {timeDisplay.textContent = String(20/level);}
+            else {timeDisplay.textContent = String(TIME_LIMIT/level);}
             circleProgress.style.strokeDashoffset = 0;
         }
 
