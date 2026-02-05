@@ -616,6 +616,7 @@
 
         // Vérifier la réponse
         function checkAnswer(selected, correct, btn) {
+            pauseTimer();
             const allBtns = document.querySelectorAll('.answer-btn');
             allBtns.forEach(b => b.disabled = true);
 
@@ -646,7 +647,6 @@
         }
 
         function checkAnswerTooLate(correct) {
-            console.log('too late');
             const allBtns = document.querySelectorAll('.answer-btn');
             allBtns.forEach(b => b.disabled = true);
 
