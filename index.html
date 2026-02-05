@@ -577,6 +577,25 @@
                 btn.onclick = () => startGame(i);
                 tableGrid.appendChild(btn);
             }
+
+            const twofivebtn = document.createElement('button');
+            twofivebtn.className = 'table-btn';
+            twofivebtn.textContent = '2 - 5';
+            twofivebtn.onclick = () => startGame(16);
+            tableGrid.appendChild(twofivebtn);
+
+            const sixninebtn = document.createElement('button');
+            sixninebtn.className = 'table-btn';
+            sixninebtn.textContent = '6 - 9';
+            sixninebtn.onclick = () => startGame(20);
+            tableGrid.appendChild(sixninebtn);
+
+            const mixbtn = document.createElement('button');
+            mixbtn.className = 'table-btn';
+            mixbtn.textContent = 'Mix';
+            mixbtn.onclick = () => startGame(42);
+            tableGrid.appendChild(mixbtn);
+            
         }
         }
 
@@ -603,19 +622,45 @@
         function generateQuestions(table) {
             const qs = [];
             const used = new Set();
-            
-            while (qs.length < 10) {
-                const multiplier = Math.floor(Math.random() * 10) + 1;
-                if (!used.has(multiplier)) {
-                    used.add(multiplier);
-                    qs.push({
-                        a: table,
-                        b: multiplier,
-                        correct: table * multiplier
+            const usedm = new Set();
+
+            if(table <= 10) {
+                while (qs.length < 10) {
+                    const multiplier = Math.floor(Math.random() * 10) + 1;
+                    if (!used.has(multiplier)) {
+                        used.add(multiplier);
+                        qs.push({
+                            a: table,
+                            b: multiplier,
+                            correct: table * multiplier
+                        });
+                    }
+                }
+            } else {
+                console.log('generating table ', table);
+                let max = table - 11;
+                let min = table - 14;
+                if(table > 21) {
+                    max = 10;
+                    min = 2;
+                }
+                while (qs.length < 10) {
+                    const multiplier = Math.floor(Math.random() * 10) + 1;
+                    const multiplicant = Math.floor(Math.random() * (max-min+1)) + min;
+                    if (!used.has(multiplier)) {
+                        used.add(multiplier);
+                        qs.push({
+                            a: multiplicant,
+                            b: multiplier,
+                            correct: multiplicant * multiplier
                     });
                 }
             }
-            return qs;
+        }
+        
+        console.log(qs);
+        return qs;
+
         }
 
         // Afficher une question
@@ -713,8 +758,6 @@
                 }
             });
             setTimeout(() => {
-                console.log('resetting timer after too late');
-                console.log('current question :', currentQuestion);
                 resetTimer();
                 currentQuestion++;
                 showQuestion();
