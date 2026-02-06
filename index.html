@@ -432,7 +432,7 @@
 
         <!-- Écran de sélection du niveau -->
         <div id="levelScreen" class="screen">
-            <h1>🎯 Choisis un niveau</h1>
+            <h1>🏔️ Choisis un niveau</h1>
             <div class="levels-grid">
                 <button class="level-button selected" data-level="0">
                     Facile
@@ -456,7 +456,7 @@
 
         <!-- Écran de sélection de la table -->
         <div id="selectScreen" class="screen">
-            <h1>🎯 Choisis ta table !</h1>
+            <h1>🎯 Choisis ta table</h1>
             <div class="table-grid" id="tableGrid"></div>
             <div class="action-buttons">
                 <button class="action-btn" onclick="goHome()">🏠 Choisir un autre niveau</button>
@@ -637,7 +637,6 @@
                     }
                 }
             } else {
-                console.log('generating table ', table);
                 let max = table - 11;
                 let min = table - 14;
                 if(table > 21) {
@@ -657,8 +656,6 @@
                 }
             }
         }
-        
-        console.log(qs);
         return qs;
 
         }
